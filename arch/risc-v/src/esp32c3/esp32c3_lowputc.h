@@ -93,6 +93,10 @@ struct esp32c3_uart_s
   uint8_t   parity;         /* 0=no parity, 1=odd parity, 2=even parity */
   uint8_t   stop_b2;        /* Use 2 stop bits? 0 no, others yes */
   uint8_t   int_pri;        /* UART Interrupt Priority */
+  uint8_t   txpin;          /* Tx pin*/
+  uint8_t   txsig;          /* Tx signal*/
+  uint8_t   rxpin;          /* Rx pin*/
+  uint8_t   rxsig;          /* Rx signal*/
 };
 
 /****************************************************************************
@@ -104,7 +108,21 @@ struct esp32c3_uart_s
  *  Reset both TX and RX core
  ****************************************************************************/
 
-void esp32c3_lowputc_reset_core(const struct esp32c3_uart_s *conf);
+void esp32c3_lowputc_reset_cores(const struct esp32c3_uart_s *conf);
+
+/****************************************************************************
+ * Name: esp32c3_lowputc_rst_tx
+ *   Reset TX core
+ ****************************************************************************/
+
+void esp32c3_lowputc_rst_tx(const struct esp32c3_uart_s *conf);
+
+/****************************************************************************
+ * Name: esp32c3_lowputc_rst_rx
+ *   Reset RX core
+ ****************************************************************************/
+
+void esp32c3_lowputc_rst_rx(const struct esp32c3_uart_s *conf);
 
 /****************************************************************************
  * Name: esp32c3_lowputc_enable_sclk
@@ -196,6 +214,66 @@ void esp32c3_lowputc_send_byte(const struct esp32c3_uart_s * conf,
 
 bool esp32c3_lowputc_is_tx_fifo_full(const struct esp32c3_uart_s *
                                      conf);
+
+/****************************************************************************
+ * Name: esp32c3_lowputc_rst_peripheral
+ *    Reset peripheral using System reg
+ ****************************************************************************/
+
+void esp32c3_lowputc_rst_peripheral(const struct esp32c3_uart_s *
+                                     conf);
+
+/****************************************************************************
+ * Name: esp32c3_lowputc_rst_txfifo
+ *    Reset tx fifo
+ ****************************************************************************/
+
+void esp32c3_lowputc_rst_txfifo(const struct esp32c3_uart_s *
+                                     conf);
+
+/****************************************************************************
+ * Name: esp32c3_lowputc_rst_rxfifo
+ *    Reset rx fifo
+ ****************************************************************************/
+
+void esp32c3_lowputc_rst_rxfifo(const struct esp32c3_uart_s *
+                                     conf);
+
+/****************************************************************************
+ * Name: disable_all_uart_int
+ *
+ * Description:
+ *   Disable all uart interrupts
+ ****************************************************************************/
+
+void disable_all_uart_int(const struct esp32c3_uart_s *priv, uint32_t *
+                          current_status);
+/****************************************************************************
+ * Name: restore_all_uart_int
+ *
+ * Description:
+ *   Restore all uart interrupts
+ ****************************************************************************/
+
+void restore_all_uart_int(const struct esp32c3_uart_s *priv, uint32_t* last_status);   
+
+// /****************************************************************************
+//  * Name: esp32c3_lowputc_config_pins
+//  *
+//  * Description:
+//  *   Configure uart pins
+//  ****************************************************************************/
+
+// void esp32c3_lowputc_config_pins(struct esp32c3_uart_s *priv);
+
+// /****************************************************************************
+//  * Name: esp32c3_lowputc_restore_pins
+//  *
+//  * Description:
+//  *   Configure pins back to normal
+//  ****************************************************************************/
+
+// void esp32c3_lowputc_config_pins(struct esp32c3_uart_s *priv);
 
 /****************************************************************************
  * Name: esp32c3_lowsetup

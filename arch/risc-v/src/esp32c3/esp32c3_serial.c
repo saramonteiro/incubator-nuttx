@@ -36,6 +36,7 @@
 #include <debug.h>
 
 #include "hardware/esp32c3_uart.h"
+#include "hardware/esp32c3_system.h"
 #include "riscv_internal.h"
 #include "riscv_arch.h"
 #include "chip.h"
@@ -157,7 +158,11 @@ static struct esp32c3_uart_s g_uart0_config =
   .bits = CONFIG_UART0_BITS,
   .parity = CONFIG_UART0_PARITY,
   .stop_b2 =  CONFIG_UART0_2STOP,
-  .int_pri = 1
+  .int_pri = 1,
+  .txpin = CONFIG_ESP32C3_UART0_TXPIN,
+  .txsig = U0TXD_OUT_IDX,
+  .rxpin = CONFIG_ESP32C3_UART0_TXPIN,
+  .rxsig = U0RXD_IN_IDX,
 };
 
 /* Fill only the requested fields */
@@ -203,7 +208,11 @@ static struct esp32c3_uart_s g_uart1_config =
   .bits = CONFIG_UART1_BITS,
   .parity = CONFIG_UART1_PARITY,
   .stop_b2 =  CONFIG_UART1_2STOP,
-  .int_pri = 1
+  .int_pri = 1,
+  .txpin = CONFIG_ESP32C3_UART1_TXPIN,
+  .txsig = U1TXD_OUT_IDX,
+  .rxpin = CONFIG_ESP32C3_UART1_RXPIN,
+  .rxsig = U1RXD_IN_IDX,
 };
 
 /* Fill only the requested fields */
@@ -293,6 +302,69 @@ static int uart_handler(int irq, FAR void *context, FAR void *arg)
 
 static int esp32c3_setup(struct uart_dev_s *dev)
 {
+  struct esp32c3_uart_s *priv = dev->priv;
+
+    /* Initialize UART module */
+
+  esp32c3_lowputc_rst_peripheral(priv);
+
+  /* Reset both cores */
+
+  esp32c3_lowputc_reset_cores(priv);
+
+  /* Configure Clock */
+
+  esp32c3_lowputc_set_sclk(priv, APB_CLK);
+
+  /* Reset TX FIFO */
+
+  esp32c3_lowputc_rst_txfifo(priv);
+
+  /* Reset RX FIFO */
+
+  esp32c3_lowputc_rst_rxfifo(priv);
+
+  /* Configure the UART Baud Rate */
+
+  esp32c3_lowputc_baud(priv);
+
+  /* Set a mode */
+
+  esp32c3_lowputc_normal_mode(priv);
+
+  /* Parity */
+
+  esp32c3_lowputc_parity(priv);
+
+  /* Data Frame size */
+
+  esp32c3_lowputc_data_length(priv);
+
+  /* Stop bit */
+
+  esp32c3_lowputc_stop_length(priv);
+
+  /* Disable uart ints */
+
+  disable_all_uart_int(priv, NULL);
+
+  /* No Tx idle interval */
+
+  esp32c3_lowputc_set_tx_idle_time(priv, 0);
+
+  /* Reset TX and RX cores */
+
+  esp32c3_lowputc_rst_tx(priv);
+  esp32c3_lowputc_rst_rx(priv);
+
+  /* Set pins */
+
+  //esp32c3_lowputc_config_pins(priv);
+
+  /* Enable cores */
+
+  esp32c3_lowputc_enable_sclk(priv);
+
   return OK;
 }
 
@@ -308,6 +380,20 @@ static int esp32c3_setup(struct uart_dev_s *dev)
 
 static void esp32c3_shutdown(struct uart_dev_s *dev)
 {
+  struct esp32c3_uart_s *priv = dev->priv;
+
+  /* clear FIFOs */
+
+  esp32c3_lowputc_rst_txfifo(priv);
+  esp32c3_lowputc_rst_rxfifo(priv);
+
+  /* Disable ints */
+
+  disable_all_uart_int(priv, NULL);
+
+  /* Back pins to normal */
+
+  //esp32c3_lowputc_config_pins(priv);
 }
 
 /****************************************************************************
@@ -582,8 +668,6 @@ void up_earlyserialinit(void)
  *
  ****************************************************************************/
 
-/* TODO */
-
 void up_serialinit(void)
 {
 #ifdef HAVE_SERIAL_CONSOLE
@@ -607,13 +691,11 @@ void up_serialinit(void)
  *
  ****************************************************************************/
 
-/* TODO - To finish later with interrupt */
-
 int up_putc(int ch)
 {
 #ifdef HAVE_SERIAL_CONSOLE
-
-  /* TODO disable uart ints */
+  uint32_t int_status;
+  disable_all_uart_int(CONSOLE_DEV.priv, &int_status);
 
   /* Check for LF */
 
@@ -625,8 +707,7 @@ int up_putc(int ch)
     }
 
   up_lowputc(ch);
-
-  /* TODO restore ints */
+  restore_all_uart_int(CONSOLE_DEV.priv, &int_status);
 #endif
   return ch;
 }
@@ -674,11 +755,12 @@ int up_putc(int ch)
  *
  ****************************************************************************/
 
-/* TODO - Finish it disabling interrupt and restoring it later */
-
 int up_putc(int ch)
 {
 #ifdef HAVE_SERIAL_CONSOLE
+  uint32_t int_status;
+  disable_all_uart_int(CONSOLE_DEV.priv, &int_status);
+
   /* Check for LF */
 
   if (ch == '\n')
@@ -689,6 +771,7 @@ int up_putc(int ch)
     }
 
   up_lowputc(ch);
+  restore_all_uart_int(CONSOLE_DEV.priv, &int_status);
 #endif
   return ch;
 }
