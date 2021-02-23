@@ -159,7 +159,8 @@ static struct esp32c3_uart_s g_uart0_config =
   .parity = CONFIG_UART0_PARITY,
   .stop_b2 =  CONFIG_UART0_2STOP,
   .int_pri = 1,
-  .txpin = CONFIG_ESP32C3_UART0_TXPIN,
+  //.txpin = CONFIG_ESP32C3_UART0_TXPIN,
+  .txpin = 18,
   .txsig = U0TXD_OUT_IDX,
   .rxpin = CONFIG_ESP32C3_UART0_TXPIN,
   .rxsig = U0RXD_IN_IDX,
@@ -304,7 +305,7 @@ static int esp32c3_setup(struct uart_dev_s *dev)
 {
   struct esp32c3_uart_s *priv = dev->priv;
 
-    /* Initialize UART module */
+  /* Initialize UART module */
 
   esp32c3_lowputc_rst_peripheral(priv);
 
@@ -359,7 +360,7 @@ static int esp32c3_setup(struct uart_dev_s *dev)
 
   /* Set pins */
 
-  //esp32c3_lowputc_config_pins(priv);
+  esp32c3_lowputc_config_pins(priv);
 
   /* Enable cores */
 
@@ -393,7 +394,7 @@ static void esp32c3_shutdown(struct uart_dev_s *dev)
 
   /* Back pins to normal */
 
-  //esp32c3_lowputc_config_pins(priv);
+  esp32c3_lowputc_restore_pins(priv);
 }
 
 /****************************************************************************

@@ -32,12 +32,6 @@
  * Pre-processor Definitions
  ****************************************************************************/
 
-// TEMPORARY - WAITING FOR GPIO SUPPORT
-#define U0TXD_OUT_IDX 1
-#define U0RXD_IN_IDX 1
-#define U1TXD_OUT_IDX 1
-#define U1RXD_IN_IDX 1
-
 /* FIFO Configuration */
 
 /* UART_FIFO_REG register

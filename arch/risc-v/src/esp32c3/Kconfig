@@ -179,6 +179,8 @@ config ESP32C3_UART1_TXPIN
 	int "UART1 Tx Pin"
 	default -1
 
+endif # ESP32C3_UART1
+
 endmenu
 
 endif # ARCH_CHIP_ESP32C3

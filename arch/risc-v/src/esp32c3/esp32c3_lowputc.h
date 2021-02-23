@@ -38,6 +38,7 @@
 #include <debug.h>
 
 #include "hardware/esp32c3_uart.h"
+#include "hardware/esp32c3_gpio_sigmap.h"
 #include "chip.h"
 
 /****************************************************************************
@@ -255,25 +256,26 @@ void disable_all_uart_int(const struct esp32c3_uart_s *priv, uint32_t *
  *   Restore all uart interrupts
  ****************************************************************************/
 
-void restore_all_uart_int(const struct esp32c3_uart_s *priv, uint32_t* last_status);   
+void restore_all_uart_int(const struct esp32c3_uart_s *priv,
+                          uint32_t* last_status);   
 
-// /****************************************************************************
-//  * Name: esp32c3_lowputc_config_pins
-//  *
-//  * Description:
-//  *   Configure uart pins
-//  ****************************************************************************/
+/****************************************************************************
+ * Name: esp32c3_lowputc_config_pins
+ *
+ * Description:
+ *   Configure uart pins
+ ****************************************************************************/
 
-// void esp32c3_lowputc_config_pins(struct esp32c3_uart_s *priv);
+void esp32c3_lowputc_config_pins(struct esp32c3_uart_s *priv);
 
-// /****************************************************************************
-//  * Name: esp32c3_lowputc_restore_pins
-//  *
-//  * Description:
-//  *   Configure pins back to normal
-//  ****************************************************************************/
+/****************************************************************************
+ * Name: esp32c3_lowputc_restore_pins
+ *
+ * Description:
+ *   Configure pins back to normal
+ ****************************************************************************/
 
-// void esp32c3_lowputc_config_pins(struct esp32c3_uart_s *priv);
+void esp32c3_lowputc_restore_pins(struct esp32c3_uart_s *priv);
 
 /****************************************************************************
  * Name: esp32c3_lowsetup

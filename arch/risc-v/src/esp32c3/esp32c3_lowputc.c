@@ -189,8 +189,7 @@ uint32_t esp32c3_lowputc_get_sclk(const struct esp32c3_uart_s * conf)
   switch (clk_conf_reg)
     {
       case 1:
-        //ret = esp32c3_clk_apb_freq();
-        ret = APB_CLK_FREQ;
+        ret = esp32c3_clk_apb_freq();
         break;
       case 2:
         ret = RTC_CLK_FREQ;
@@ -450,41 +449,41 @@ void restore_all_uart_int(const struct esp32c3_uart_s *priv, uint32_t* last_stat
   putreg32(*last_status, UART_INT_ENA_REG(priv->id));
 }
 
-// /****************************************************************************
-//  * Name: esp32c3_lowputc_config_pins
-//  *
-//  * Description:
-//  *   Configure uart pins
-//  ****************************************************************************/
+/****************************************************************************
+ * Name: esp32c3_lowputc_config_pins
+ *
+ * Description:
+ *   Configure uart pins
+ ****************************************************************************/
 
-// void esp32c3_lowputc_config_pins(struct esp32c3_uart_s *priv)
-// {
-//   /* Configure the pins */
+void esp32c3_lowputc_config_pins(struct esp32c3_uart_s *priv)
+{
+  /* Configure the pins */
 
-//   esp32c3_configgpio(priv->txpin, OUTPUT_FUNCTION_1);
-//   gpio_matrix_out(priv->txpin, priv->txsig, 0, 0);
+  esp32c3_configgpio(priv->txpin, OUTPUT_FUNCTION_1);
+  esp32c3_gpio_matrix_out(priv->txpin, priv->txsig, 0, 0);
 
-//   esp32c3_configgpio(priv->rxpin, INPUT_FUNCTION_1);
-//   gpio_matrix_in(priv->rxpin, priv->rxsig, 0);
-// }
+  esp32c3_configgpio(priv->rxpin, INPUT_FUNCTION_1);
+  esp32c3_gpio_matrix_in(priv->rxpin, priv->rxsig, 0);
+}
 
-// /****************************************************************************
-//  * Name: esp32c3_lowputc_restore_pins
-//  *
-//  * Description:
-//  *   Configure pins back to normal
-//  ****************************************************************************/
+/****************************************************************************
+ * Name: esp32c3_lowputc_restore_pins
+ *
+ * Description:
+ *   Configure pins back to normal
+ ****************************************************************************/
 
-// void esp32c3_lowputc_config_pins(struct esp32c3_uart_s *priv)
-// {
-//   /* Configure the pins */
+void esp32c3_lowputc_restore_pins(struct esp32c3_uart_s *priv)
+{
+  /* Configure the pins */
 
-//   esp32c3_configgpio(priv->txpin, INPUT);
-//   gpio_matrix_out(priv->txpin, MATRIX_DETACH_OUT_SIG, false, false);
+  esp32c3_configgpio(priv->txpin, INPUT);
+  esp32c3_gpio_matrix_out(priv->txpin, MATRIX_DETACH_OUT_SIG, false, false);
 
-//   esp32c3_configgpio(priv->rxpin, INPUT);
-//   gpio_matrix_in(priv->rxpin, MATRIX_DETACH_IN_LOW_PIN, false);
-// }
+  esp32c3_configgpio(priv->rxpin, INPUT);
+  esp32c3_gpio_matrix_in(priv->rxpin, MATRIX_DETACH_IN_LOW_PIN, false);
+}
 
 /****************************************************************************
  * Name: up_lowputc
